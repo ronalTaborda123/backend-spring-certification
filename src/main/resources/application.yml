@@ -1,0 +1,10 @@
+keycloak:
+  auth-server-url: http://localhost:8090/auth
+  realm: orders
+  resource: backend
+  credentials:
+    secret: 65558221-8db8-43db-bf7b-dff0e8409e44
+
+spring:
+  profiles:
+    active: dev
