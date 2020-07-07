@@ -7,15 +7,12 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import io.vavr.control.Try;
-import co.com.ias.certification.backend.products.product.domain.*;
-import co.com.ias.certification.backend.products.product.port.out.CreateProductPort;
-import co.com.ias.certification.backend.products.product.port.out.DeleteProductPort;
-import co.com.ias.certification.backend.products.product.port.out.ListProductPort;
-import co.com.ias.certification.backend.products.product.port.out.UpdateProductPort;
 
+import co.com.ias.certification.backend.products.product.Mapper.ProductMapper;
+import co.com.ias.certification.backend.products.product.domain.*;
+import co.com.ias.certification.backend.products.product.port.out.*;
 
 
 public class SqlProductRepository implements CreateProductPort, ListProductPort , UpdateProductPort , DeleteProductPort {
@@ -43,38 +40,18 @@ public class SqlProductRepository implements CreateProductPort, ListProductPort 
 
         number = simpleJdbcInsert.execute(parameters);
         String SQL = "SELECT * FROM PRODUCTS ORDER BY ID DESC LIMIT 1";
-        return jdbcTemplate.queryForObject(SQL,rowMapper);
+        return jdbcTemplate.queryForObject(SQL,new ProductMapper());
         });
 //        /return Product.of(productCreate(ProductId.of(product.getProductId().getValue()),productOperationRequest));
     }
 
-    private final RowMapper<Product> rowMapper = (resultSet, i) -> {
-
-//        ProductId id1 = ProductId.of(resultSet.getLong("ID"));
-//        Name name = Name.of(resultSet.getString("NAME"));
-//        Description description = Description.of(resultSet.getString("DESCRIPTION"));
-//        BasePrice basePrice = BasePrice.of(resultSet.getBigDecimal("BASE_PRICE"));
-//        TaxRate taxRate = TaxRate.of(resultSet.getBigDecimal("TAX_RATE"));
-//        ProductStatus productStatus = ProductStatus.valueOf(resultSet.getString("STATUS"));
-//        InventoryQuantity inventoryQuantity = InventoryQuantity.of(resultSet.getInt("INVENTORY_QUANTITY"));
-
-//        return Product.of(id1, name, description,basePrice,taxRate,productStatus,inventoryQuantity);
-        return Product.builder().
-                id(ProductId.of(resultSet.getLong("ID")))
-                .name(Name.of(resultSet.getString("NAME")))
-                .description(Description.of(resultSet.getString("DESCRIPTION")))
-                .basePrice(BasePrice.of(resultSet.getBigDecimal("BASE_PRICE")))
-                .taxRate(TaxRate.of(resultSet.getBigDecimal("TAX_RATE")))
-                .productStatus(ProductStatus.valueOf(resultSet.getString("STATUS")))
-                .inventoryQuantity(InventoryQuantity.of(resultSet.getInt("INVENTORY_QUANTITY"))).build();
-    };
 
     @Override
     public Try<List<Product>>getListProduct() {
 
         return Try.of(()->{
             String SQL = "SELECT ID, NAME, DESCRIPTION,BASE_PRICE ,TAX_RATE ,STATUS ,INVENTORY_QUANTITY FROM PRODUCTS ";
-            List<Product> product= jdbcTemplate.query(SQL,rowMapper);
+            List<Product> product= jdbcTemplate.query(SQL,new ProductMapper());
             return product;
         });
     }
@@ -123,4 +100,5 @@ public class SqlProductRepository implements CreateProductPort, ListProductPort 
         });
 
     }
+
 }

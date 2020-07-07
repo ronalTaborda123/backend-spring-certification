@@ -2,20 +2,18 @@ package co.com.ias.certification.backend.products.controllers;
 
 
 import org.keycloak.KeycloakPrincipal;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import io.vavr.control.Try;
+
+import java.io.IOException;
 import java.util.List;
-import co.com.ias.certification.backend.products.product.domain.Product;
-import co.com.ias.certification.backend.products.product.domain.ProductId;
-import co.com.ias.certification.backend.products.product.domain.ProductOperationRequest;
-import co.com.ias.certification.backend.products.product.port.in.CreateProductUseCase;
-import co.com.ias.certification.backend.products.product.port.in.DeleteProductUseCase;
-import co.com.ias.certification.backend.products.product.port.in.ListProductUseCase;
-import co.com.ias.certification.backend.products.product.port.in.UpdateProductUseCase;
+
+import co.com.ias.certification.backend.products.product.domain.*;
+import co.com.ias.certification.backend.products.product.port.in.*;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -27,6 +25,8 @@ public class ProductsController {
     private final ListProductUseCase listProductUseCase;
     private final UpdateProductUseCase updateProductUseCase;
     private final DeleteProductUseCase deleteProductUseCase;
+    private final UploadImageUseCase uploadImageUseCase;
+    private final ListImageUseCase listImageUseCase;
 
     @PostMapping
     public Try<Product> createProduct( Authentication authentication, @RequestBody ProductOperationRequest productOperationRequest){
@@ -57,5 +57,18 @@ public class ProductsController {
     public Try<Product> deleteProduct(@PathVariable Long id){
         ProductId productId=ProductId.of(id);
         return deleteProductUseCase.deleteProduct(productId);
+    }
+
+    @PostMapping("/images")
+    public Try<String> uploadImages(@RequestParam("file") MultipartFile file, @RequestParam("id") Long productId) throws IOException {
+        ProductId id = ProductId.of(productId);
+        UploadImageRequest uploadImageRequest= UploadImageRequest.of(id,file.getName(),file.getContentType(), file.getBytes());
+        return uploadImageUseCase.createImage(uploadImageRequest);
+
+    }
+    @GetMapping("/images/{id}")
+    public Try<List<Image>> getFile(@PathVariable Long productId) {
+        ProductId id = ProductId.of(productId);
+        return listImageUseCase.getFile(id);
     }
 }
