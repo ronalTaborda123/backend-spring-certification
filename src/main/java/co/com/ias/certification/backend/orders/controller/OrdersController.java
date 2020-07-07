@@ -21,14 +21,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class OrdersController {
 
-//    private final CreateOrdersUseCase createOrdersUseCase;
+    private final CreateOrdersUseCase createOrdersUseCase;
 //    private final DeleteOrdersUseCase deleteOrdersUseCase;
 
-//    @PostMapping
-//    public Try<Order> createProduct(Authentication authentication, @RequestBody OrderOperationRequest orderOperationRequest){
-//        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal)authentication.getPrincipal();
-//        return createOrdersUseCase.createOrder(orderOperationRequest);
-//    }
+    @PostMapping
+    public Try<Order> createProduct(Authentication authentication, @RequestBody OrderOperationRequest orderOperationRequest){
+        KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal)authentication.getPrincipal();
+        return createOrdersUseCase.createOrder(orderOperationRequest);
+    }
 
 //    @DeleteMapping("/{id}")
 //    public Try<Order> deleteOrder(@PathVariable Long id){
