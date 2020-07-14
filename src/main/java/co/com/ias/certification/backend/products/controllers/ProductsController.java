@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/apli/v1/products")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class ProductsController {
 
     private final CreateProductUseCase createProductUseCase;
@@ -27,6 +28,7 @@ public class ProductsController {
     private final DeleteProductUseCase deleteProductUseCase;
     private final UploadImageUseCase uploadImageUseCase;
     private final ListImageUseCase listImageUseCase;
+    private final SearchProductUseCase searchProductUseCase;
 
     @PostMapping
     public Try<Product> createProduct( Authentication authentication, @RequestBody ProductOperationRequest productOperationRequest){
@@ -40,11 +42,13 @@ public class ProductsController {
         return listProductUseCase.getListProduct();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Product>getProductById(Authentication authentication, @PathVariable String id){
-        System.out.println( id);
+    @GetMapping("/{name}")
+    public Try<List<Product>>getProductById(Authentication authentication, @PathVariable String name){
+        Name nameRequest=Name.of(name);
+
         KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal)authentication.getPrincipal();
-        return null;
+
+        return searchProductUseCase.getProduct(nameRequest);
     }
 
     @PutMapping("/{id}")

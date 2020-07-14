@@ -15,7 +15,7 @@ import co.com.ias.certification.backend.products.product.domain.*;
 import co.com.ias.certification.backend.products.product.port.out.*;
 
 
-public class SqlProductRepository implements CreateProductPort, ListProductPort , UpdateProductPort , DeleteProductPort {
+public class SqlProductRepository implements CreateProductPort, ListProductPort , UpdateProductPort , DeleteProductPort,SearchProductPot {
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert simpleJdbcInsert;
@@ -101,4 +101,13 @@ public class SqlProductRepository implements CreateProductPort, ListProductPort 
 
     }
 
+    @Override
+    public Try<List<Product>> getProduct(Name name) {
+        return Try.of(()->{
+            String SQL = "SELECT ID, NAME, DESCRIPTION,BASE_PRICE ,TAX_RATE ,STATUS ,INVENTORY_QUANTITY FROM PRODUCTS WHERE NAME LIKE '%?%'";
+            Object[] objects = {name.valueOf()};
+            List<Product> product= jdbcTemplate.query(SQL,objects,new ProductMapper());
+            return product;
+        });
+    }
 }
